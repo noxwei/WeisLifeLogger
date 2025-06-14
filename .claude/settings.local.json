@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(dotnet new:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(dotnet add package:*)",
+      "Bash(dotnet build)",
+      "Bash(dotnet run:*)",
+      "Bash(sqlite3:*)",
+      "Bash(pkill:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)"
+    ],
+    "deny": []
+  }
+}

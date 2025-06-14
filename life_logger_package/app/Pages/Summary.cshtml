@@ -1,0 +1,276 @@
+@page
+@model SummaryModel
+@{
+    ViewData["Title"] = "Daily Summary";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 text-primary">
+                <i class="fas fa-calendar-day"></i> Daily Summary
+            </h1>
+            <p class="lead text-muted">Explore your daily life patterns and activities</p>
+        </div>
+    </div>
+
+    <!-- Date Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="selectedDate" class="form-label">Select Date</label>
+                            <input type="date" class="form-control" id="selectedDate" name="selectedDate" value="@Model.SelectedDate">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> View Summary
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group" role="group">
+                                <a href="@Model.GetDateUrl(DateTime.Now.ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary btn-sm">Today</a>
+                                <a href="@Model.GetDateUrl(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary btn-sm">Yesterday</a>
+                                <a href="@Model.GetDateUrl(DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary btn-sm">Week Ago</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Summary != null && Model.Summary.EntryCount > 0)
+    {
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-2x mb-2"></i>
+                        <h4>@Model.Summary.EntryCount</h4>
+                        <small>Total Entries</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                        <h4>@Model.Summary.Locations.Count</h4>
+                        <small>Unique Locations</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-running fa-2x mb-2"></i>
+                        <h4>@Model.Summary.Activities.Count</h4>
+                        <small>Different Activities</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-walking fa-2x mb-2"></i>
+                        <h4>@(Model.Summary.TotalSteps?.ToString("N0") ?? "N/A")</h4>
+                        <small>Total Steps</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Locations Visited -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-map"></i> Locations Visited</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Summary.Locations.Any())
+                        {
+                            @foreach (var location in Model.Summary.Locations)
+                            {
+                                <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-map-marker-alt"></i> @location
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Summary.MostFrequentLocation))
+                            {
+                                <hr>
+                                <small class="text-muted">
+                                    <strong>Most visited:</strong> @Model.Summary.MostFrequentLocation
+                                </small>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No location data recorded for this date.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activities & Actions -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tasks"></i> Activities & Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Summary.UniqueActions.Any())
+                        {
+                            @foreach (var action in Model.Summary.UniqueActions)
+                            {
+                                <span class="badge bg-info me-2 mb-2">@action</span>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No activities recorded for this date.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Information -->
+        @if (!string.IsNullOrEmpty(Model.Summary.Weather))
+        {
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-cloud-sun"></i> Weather</h5>
+                        </div>
+                        <div class="card-body">
+                            <span class="badge bg-secondary fs-6">
+                                <i class="fas fa-thermometer-half"></i> @Model.Summary.Weather
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Daily Entries -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list"></i> Entries for @Model.SelectedDate</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.DayEntries.Any())
+                        {
+                            <div class="timeline">
+                                @foreach (var entry in Model.DayEntries.OrderBy(e => e.Time))
+                                {
+                                    <div class="timeline-item mb-4">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="text-primary fw-bold">@entry.Time</div>
+                                                @if (!string.IsNullOrEmpty(entry.Location))
+                                                {
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-map-marker-alt"></i> @entry.Location
+                                                    </small>
+                                                }
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="entry-content p-3 bg-light rounded">
+                                                    <div class="mb-2">@entry.Entry</div>
+                                                    
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        @if (!string.IsNullOrEmpty(entry.Action))
+                                                        {
+                                                            <span class="badge bg-info">@entry.Action</span>
+                                                        }
+                                                        @if (entry.Steps.HasValue)
+                                                        {
+                                                            <span class="badge bg-success">
+                                                                <i class="fas fa-walking"></i> @entry.Steps.Value.ToString("N0") steps
+                                                            </span>
+                                                        }
+                                                        @if (entry.Hrv.HasValue)
+                                                        {
+                                                            <span class="badge bg-danger">
+                                                                <i class="fas fa-heartbeat"></i> @entry.Hrv.Value HRV
+                                                            </span>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(entry.Device))
+                                                        {
+                                                            <span class="badge bg-secondary">
+                                                                <i class="fas fa-mobile-alt"></i> @entry.Device
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No entries found for this date</h5>
+                                <p class="text-muted">Try selecting a different date or check if data has been imported.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- No Data State -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted">No Data Available</h4>
+                        <p class="text-muted">No entries found for @Model.SelectedDate</p>
+                        <p class="text-muted">Try selecting a different date or import some data to get started.</p>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.timeline-item {
+    border-left: 3px solid var(--bs-primary);
+    padding-left: 20px;
+    margin-left: 10px;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+}
+
+.entry-content {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>

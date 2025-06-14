@@ -1,0 +1,457 @@
+@page
+@model MapsModel
+@{
+    ViewData["Title"] = "GEOGRAPHIC INTELLIGENCE";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ascii-border">
+                <h1 class="terminal-title text-center">
+                    ███╗   ███╗ █████╗ ██████╗ ███████╗
+                    <br>████╗ ████║██╔══██╗██╔══██╗██╔════╝
+                    <br>██╔████╔██║███████║██████╔╝███████╗
+                    <br>██║╚██╔╝██║██╔══██║██╔═══╝ ╚════██║
+                    <br>██║ ╚═╝ ██║██║  ██║██║     ███████║
+                    <br>╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝
+                </h1>
+                <p class="terminal-text text-center terminal-cursor">
+                    <span class="terminal-prompt">GEOGRAPHIC INTELLIGENCE SYSTEM - ANN ARBOR SECTOR</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    MAP CONTROL INTERFACE
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">DATE RANGE</label>
+                            <select id="dateRangeSelect" class="form-select">
+                                <option value="all">ALL TIME</option>
+                                <option value="7">LAST 7 DAYS</option>
+                                <option value="30">LAST 30 DAYS</option>
+                                <option value="90">LAST 90 DAYS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">VIEW MODE</label>
+                            <select id="viewModeSelect" class="form-select">
+                                <option value="markers">LOCATION MARKERS</option>
+                                <option value="heatmap">FREQUENCY HEATMAP</option>
+                                <option value="routes">TRAVEL ROUTES</option>
+                                <option value="timeline">TIME PROGRESSION</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">LOCATION FILTER</label>
+                            <select id="locationFilter" class="form-select">
+                                <option value="all">ALL LOCATIONS</option>
+                                <option value="home">HOME BASE</option>
+                                <option value="shopping">COMMERCIAL</option>
+                                <option value="dining">DINING</option>
+                                <option value="travel">TRANSIT</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">ACTIONS</label>
+                            <div class="d-flex gap-2">
+                                <button id="refreshMapBtn" class="btn btn-primary flex-fill">REFRESH</button>
+                                <button id="exportMapBtn" class="btn btn-secondary">EXPORT</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Map -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    TACTICAL MAP DISPLAY
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div id="mainMap" style="height: 500px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Intelligence -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION FREQUENCY ANALYSIS
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="locationFrequencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    TEMPORAL ACTIVITY PATTERN
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="hourlyActivityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION INTELLIGENCE REPORT
+                </div>
+                <div class="card-body">
+                    <div class="terminal-text" id="locationStats">
+                        <div class="terminal-prompt">system.locations --analyze</div>
+                        <div id="statsContent" style="margin-left: 1rem; margin-top: 0.5rem;">
+                            LOADING INTELLIGENCE DATA...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini Maps Grid -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    CLUSTER ANALYSIS VIEW
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div id="clusterMap" style="height: 300px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    ROUTE PATTERN ANALYSIS
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div id="routeMap" style="height: 300px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="mapLoadingOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.9);
+    display: none;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+">
+    <div class="terminal-text" style="text-align: center;">
+        <div style="font-size: 24px; color: var(--terminal-cyan); margin-bottom: 1rem;">
+            ████████▓▓▓▓▓▓▓░░░░
+        </div>
+        <div class="terminal-prompt" style="font-size: 18px;">
+            LOADING GEOGRAPHIC DATA...
+        </div>
+        <div style="margin-top: 1rem; font-size: 14px; color: var(--terminal-gray);">
+            ANALYZING LOCATION PATTERNS
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- Custom Terminal Map Styles -->
+    <style>
+        .leaflet-container {
+            background: var(--terminal-bg) !important;
+        }
+        
+        .leaflet-control-zoom a {
+            background-color: var(--terminal-bg-card) !important;
+            color: var(--terminal-green) !important;
+            border: 1px solid var(--terminal-green) !important;
+            font-family: 'Fira Code', monospace !important;
+        }
+        
+        .leaflet-control-zoom a:hover {
+            background-color: var(--terminal-green) !important;
+            color: var(--terminal-bg) !important;
+        }
+        
+        .leaflet-control-attribution {
+            background-color: var(--terminal-bg-card) !important;
+            color: var(--terminal-green) !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            border: 1px solid var(--terminal-green) !important;
+        }
+        
+        .leaflet-popup-content-wrapper {
+            background: var(--terminal-bg-card) !important;
+            border: 2px solid var(--terminal-green) !important;
+            box-shadow: 0 0 20px var(--terminal-glow) !important;
+        }
+        
+        .leaflet-popup-tip {
+            background: var(--terminal-bg-card) !important;
+            border: 1px solid var(--terminal-green) !important;
+        }
+        
+        .terminal-cluster-marker {
+            animation: terminal-glow 2s ease-in-out infinite alternate;
+        }
+        
+        .terminal-location-marker {
+            animation: cursor-blink 2s infinite;
+        }
+        
+        .terminal-route-line {
+            filter: drop-shadow(0 0 5px var(--terminal-cyan));
+        }
+    </style>
+    
+    <script type="module">
+        import { LifeLoggerAPI, DataProcessor } from '/js/dist/utils/api.js';
+        import { TerminalMaps } from '/js/dist/maps/leafletMaps.js';
+        import { TerminalCharts } from '/js/dist/visualizations/charts.js';
+        
+        class MapsPage {
+            constructor() {
+                this.entries = [];
+                this.filteredEntries = [];
+                this.currentViewMode = 'markers';
+                this.init();
+            }
+            
+            async init() {
+                this.showLoading(true);
+                
+                try {
+                    await this.loadData();
+                    this.initializeMaps();
+                    this.initializeCharts();
+                    this.initializeControls();
+                    this.updateLocationStats();
+                } catch (error) {
+                    console.error('Failed to initialize maps page:', error);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            async loadData() {
+                const response = await LifeLoggerAPI.getEntries();
+                if (response.success) {
+                    this.entries = response.data.filter(entry => entry.location);
+                    this.filteredEntries = [...this.entries];
+                }
+            }
+            
+            initializeMaps() {
+                // Main map
+                TerminalMaps.createMap('mainMap');
+                TerminalMaps.createLocationMarkers('mainMap', this.filteredEntries);
+                TerminalMaps.addLocationSearch('mainMap', this.filteredEntries);
+                
+                // Cluster analysis map
+                TerminalMaps.createMap('clusterMap');
+                TerminalMaps.createLocationMarkers('clusterMap', this.filteredEntries);
+                
+                // Route analysis map
+                TerminalMaps.createMap('routeMap');
+                TerminalMaps.createRouteVisualization('routeMap', this.filteredEntries);
+            }
+            
+            initializeCharts() {
+                TerminalCharts.createLocationFrequencyChart('locationFrequencyChart', this.filteredEntries);
+                TerminalCharts.createHourlyActivityChart('hourlyActivityChart', this.filteredEntries);
+            }
+            
+            initializeControls() {
+                document.getElementById('dateRangeSelect').addEventListener('change', (e) => {
+                    this.filterByDateRange(e.target.value);
+                });
+                
+                document.getElementById('viewModeSelect').addEventListener('change', (e) => {
+                    this.changeViewMode(e.target.value);
+                });
+                
+                document.getElementById('locationFilter').addEventListener('change', (e) => {
+                    this.filterByLocation(e.target.value);
+                });
+                
+                document.getElementById('refreshMapBtn').addEventListener('click', () => {
+                    this.refreshMaps();
+                });
+                
+                document.getElementById('exportMapBtn').addEventListener('click', () => {
+                    this.exportMapData();
+                });
+            }
+            
+            filterByDateRange(days) {
+                if (days === 'all') {
+                    this.filteredEntries = [...this.entries];
+                } else {
+                    const cutoffDate = new Date();
+                    cutoffDate.setDate(cutoffDate.getDate() - parseInt(days));
+                    this.filteredEntries = this.entries.filter(entry => 
+                        new Date(entry.datetime) >= cutoffDate
+                    );
+                }
+                this.refreshMaps();
+                this.updateCharts();
+                this.updateLocationStats();
+            }
+            
+            filterByLocation(category) {
+                if (category === 'all') {
+                    // Use already filtered entries (by date)
+                    const dateFilter = document.getElementById('dateRangeSelect').value;
+                    this.filterByDateRange(dateFilter);
+                } else {
+                    this.filteredEntries = this.filteredEntries.filter(entry => 
+                        DataProcessor.categorizeLocation(entry.location) === category
+                    );
+                }
+                this.refreshMaps();
+                this.updateCharts();
+                this.updateLocationStats();
+            }
+            
+            changeViewMode(mode) {
+                this.currentViewMode = mode;
+                this.refreshMainMap();
+            }
+            
+            refreshMainMap() {
+                TerminalMaps.clearMarkers('mainMap');
+                
+                switch (this.currentViewMode) {
+                    case 'markers':
+                        TerminalMaps.createLocationMarkers('mainMap', this.filteredEntries);
+                        break;
+                    case 'heatmap':
+                        TerminalMaps.createHeatmap('mainMap', this.filteredEntries);
+                        break;
+                    case 'routes':
+                        TerminalMaps.createRouteVisualization('mainMap', this.filteredEntries);
+                        break;
+                    case 'timeline':
+                        TerminalMaps.createLocationMarkers('mainMap', this.filteredEntries);
+                        TerminalMaps.createRouteVisualization('mainMap', this.filteredEntries);
+                        break;
+                }
+            }
+            
+            refreshMaps() {
+                this.refreshMainMap();
+                
+                TerminalMaps.clearMarkers('clusterMap');
+                TerminalMaps.createLocationMarkers('clusterMap', this.filteredEntries);
+                
+                TerminalMaps.clearMarkers('routeMap');
+                TerminalMaps.createRouteVisualization('routeMap', this.filteredEntries);
+            }
+            
+            updateCharts() {
+                TerminalCharts.createLocationFrequencyChart('locationFrequencyChart', this.filteredEntries);
+                TerminalCharts.createHourlyActivityChart('hourlyActivityChart', this.filteredEntries);
+            }
+            
+            updateLocationStats() {
+                const locationCounts = DataProcessor.aggregateLocationVisits(this.filteredEntries);
+                const totalVisits = Array.from(locationCounts.values()).reduce((a, b) => a + b, 0);
+                const uniqueLocations = locationCounts.size;
+                const avgVisitsPerLocation = totalVisits / uniqueLocations || 0;
+                
+                const topLocation = Array.from(locationCounts.entries())
+                    .sort(([,a], [,b]) => b - a)[0];
+                
+                const hourlyData = DataProcessor.createHourlyDistribution(this.filteredEntries);
+                const peakHour = Object.entries(hourlyData)
+                    .sort(([,a], [,b]) => b - a)[0];
+                
+                const statsContent = document.getElementById('statsContent');
+                statsContent.innerHTML = `
+                    TOTAL_ENTRIES.......: ${this.filteredEntries.length}<br>
+                    UNIQUE_LOCATIONS....: ${uniqueLocations}<br>
+                    TOTAL_VISITS........: ${totalVisits}<br>
+                    AVG_VISITS_PER_LOC..: ${avgVisitsPerLocation.toFixed(1)}<br>
+                    <br>
+                    TOP_LOCATION........: ${topLocation ? topLocation[0].substring(0, 40) + '...' : 'N/A'}<br>
+                    TOP_LOCATION_VISITS.: ${topLocation ? topLocation[1] : 'N/A'}<br>
+                    <br>
+                    PEAK_ACTIVITY_HOUR..: ${peakHour ? peakHour[0].padStart(2, '0') + ':00' : 'N/A'}<br>
+                    PEAK_HOUR_ENTRIES...: ${peakHour ? peakHour[1] : 'N/A'}<br>
+                `;
+            }
+            
+            exportMapData() {
+                const data = {
+                    entries: this.filteredEntries,
+                    statistics: {
+                        totalEntries: this.filteredEntries.length,
+                        uniqueLocations: DataProcessor.aggregateLocationVisits(this.filteredEntries).size,
+                        exportedAt: new Date().toISOString()
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `life-logger-map-data-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            showLoading(show) {
+                const overlay = document.getElementById('mapLoadingOverlay');
+                overlay.style.display = show ? 'flex' : 'none';
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new MapsPage();
+        });
+    </script>
+}

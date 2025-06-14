@@ -1,0 +1,731 @@
+@page
+@model TimelineModel
+@{
+    ViewData["Title"] = "TEMPORAL ANALYSIS";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ascii-border">
+                <h1 class="terminal-title text-center">
+                    ████████╗██╗███╗   ███╗███████╗██╗     ██╗███╗   ██╗███████╗
+                    <br>╚══██╔══╝██║████╗ ████║██╔════╝██║     ██║████╗  ██║██╔════╝
+                    <br>   ██║   ██║██╔████╔██║█████╗  ██║     ██║██╔██╗ ██║█████╗  
+                    <br>   ██║   ██║██║╚██╔╝██║██╔══╝  ██║     ██║██║╚██╗██║██╔══╝  
+                    <br>   ██║   ██║██║ ╚═╝ ██║███████╗███████╗██║██║ ╚████║███████╗
+                    <br>   ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝
+                </h1>
+                <p class="terminal-text text-center terminal-cursor">
+                    <span class="terminal-prompt">TEMPORAL ANALYSIS SYSTEM - CHRONOLOGICAL DATA VISUALIZATION</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    TIMELINE CONTROL INTERFACE
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">TARGET DATE</label>
+                            <input type="date" id="timelineDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">VIEW SCOPE</label>
+                            <select id="viewScope" class="form-select">
+                                <option value="day">24-HOUR CYCLE</option>
+                                <option value="week">7-DAY PERIOD</option>
+                                <option value="month">30-DAY SPAN</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">DATA GRANULARITY</label>
+                            <select id="granularity" class="form-select">
+                                <option value="hour">HOURLY</option>
+                                <option value="4hour">4-HOUR BLOCKS</option>
+                                <option value="day">DAILY</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">ACTIONS</label>
+                            <div class="d-flex gap-2">
+                                <button id="loadTimelineBtn" class="btn btn-primary flex-fill">ANALYZE</button>
+                                <button id="exportTimelineBtn" class="btn btn-secondary">EXPORT</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Visualization -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    CHRONOLOGICAL EVENT SEQUENCE
+                </div>
+                <div class="card-body" style="padding: 1rem;">
+                    <div id="timelineVisualization" style="height: 400px; overflow-y: auto; overflow-x: hidden;">
+                        <div class="terminal-text text-center" style="padding: 2rem;">
+                            <div class="terminal-prompt">timeline.init --loading</div>
+                            <div style="margin-top: 1rem;">SELECT DATE TO BEGIN TEMPORAL ANALYSIS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Temporal Analytics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    HOURLY ACTIVITY DISTRIBUTION
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="hourlyDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    ACTIVITY TYPE BREAKDOWN
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="activityTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Analysis Grid -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION PROGRESSION
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="locationProgressionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    STEPS TRACKING TIMELINE
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="stepsTimelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Temporal Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    TEMPORAL ANALYSIS REPORT
+                </div>
+                <div class="card-body">
+                    <div class="terminal-text" id="temporalStats">
+                        <div class="terminal-prompt">system.temporal --analyze</div>
+                        <div id="temporalStatsContent" style="margin-left: 1rem; margin-top: 0.5rem;">
+                            SELECT DATE RANGE TO GENERATE TEMPORAL ANALYSIS
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Heatmap -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    TEMPORAL ACTIVITY HEATMAP
+                </div>
+                <div class="card-body">
+                    <div id="activityHeatmap" style="height: 200px; overflow-x: auto;">
+                        <div class="terminal-text" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.2;">
+                            <div id="heatmapGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Timeline Loading Overlay -->
+<div id="timelineLoadingOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.9);
+    display: none;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+">
+    <div class="terminal-text" style="text-align: center;">
+        <div style="font-size: 24px; color: var(--terminal-cyan); margin-bottom: 1rem;">
+            ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░
+        </div>
+        <div class="terminal-prompt" style="font-size: 18px;">
+            PROCESSING TEMPORAL DATA...
+        </div>
+        <div style="margin-top: 1rem; font-size: 14px; color: var(--terminal-gray);">
+            ANALYZING CHRONOLOGICAL PATTERNS
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <script type="module">
+        import { LifeLoggerAPI, DataProcessor } from '/js/dist/utils/api.js';
+        import { TerminalCharts } from '/js/dist/visualizations/charts.js';
+        
+        class TimelinePage {
+            constructor() {
+                this.allEntries = [];
+                this.filteredEntries = [];
+                this.currentDate = new Date().toISOString().split('T')[0];
+                this.currentScope = 'day';
+                this.currentGranularity = 'hour';
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    await this.loadData();
+                    this.initializeControls();
+                } catch (error) {
+                    console.error('Failed to initialize timeline page:', error);
+                }
+            }
+            
+            async loadData() {
+                const response = await LifeLoggerAPI.getEntries();
+                if (response.success) {
+                    this.allEntries = response.data.sort((a, b) => a.datetime.localeCompare(b.datetime));
+                }
+            }
+            
+            initializeControls() {
+                document.getElementById('timelineDate').addEventListener('change', (e) => {
+                    this.currentDate = e.target.value;
+                    this.updateTimeline();
+                });
+                
+                document.getElementById('viewScope').addEventListener('change', (e) => {
+                    this.currentScope = e.target.value;
+                    this.updateTimeline();
+                });
+                
+                document.getElementById('granularity').addEventListener('change', (e) => {
+                    this.currentGranularity = e.target.value;
+                    this.updateCharts();
+                });
+                
+                document.getElementById('loadTimelineBtn').addEventListener('click', () => {
+                    this.updateTimeline();
+                });
+                
+                document.getElementById('exportTimelineBtn').addEventListener('click', () => {
+                    this.exportTimelineData();
+                });
+                
+                // Load initial timeline
+                this.updateTimeline();
+            }
+            
+            async updateTimeline() {
+                this.showLoading(true);
+                
+                try {
+                    this.filterEntriesByDateRange();
+                    this.renderTimelineVisualization();
+                    this.updateCharts();
+                    this.updateTemporalStats();
+                    this.renderActivityHeatmap();
+                } catch (error) {
+                    console.error('Failed to update timeline:', error);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            filterEntriesByDateRange() {
+                const targetDate = new Date(this.currentDate);
+                
+                switch (this.currentScope) {
+                    case 'day':
+                        this.filteredEntries = this.allEntries.filter(entry => {
+                            const entryDate = new Date(entry.date);
+                            return entryDate.toDateString() === targetDate.toDateString();
+                        });
+                        break;
+                    case 'week':
+                        const weekStart = new Date(targetDate);
+                        weekStart.setDate(targetDate.getDate() - targetDate.getDay());
+                        const weekEnd = new Date(weekStart);
+                        weekEnd.setDate(weekStart.getDate() + 6);
+                        
+                        this.filteredEntries = this.allEntries.filter(entry => {
+                            const entryDate = new Date(entry.date);
+                            return entryDate >= weekStart && entryDate <= weekEnd;
+                        });
+                        break;
+                    case 'month':
+                        const monthStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                        const monthEnd = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
+                        
+                        this.filteredEntries = this.allEntries.filter(entry => {
+                            const entryDate = new Date(entry.date);
+                            return entryDate >= monthStart && entryDate <= monthEnd;
+                        });
+                        break;
+                }
+            }
+            
+            renderTimelineVisualization() {
+                const container = document.getElementById('timelineVisualization');
+                
+                if (this.filteredEntries.length === 0) {
+                    container.innerHTML = `
+                        <div class="terminal-text text-center" style="padding: 2rem;">
+                            <div class="terminal-prompt">timeline.query --no-data</div>
+                            <div style="margin-top: 1rem; color: var(--terminal-yellow);">NO ENTRIES FOUND FOR SELECTED DATE RANGE</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let timelineHTML = '';
+                
+                this.filteredEntries.forEach((entry, index) => {
+                    const time = DataProcessor.formatDateTime(entry.datetime);
+                    const isLocationEntry = entry.action && (entry.action.includes('Driving') || entry.action.includes('Arriving') || entry.action.includes('Leaving'));
+                    
+                    timelineHTML += `
+                        <div class="timeline-item" style="margin-bottom: 1.5rem;">
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="
+                                    min-width: 120px;
+                                    color: var(--terminal-cyan);
+                                    font-family: 'Fira Code', monospace;
+                                    font-size: 12px;
+                                    text-align: right;
+                                ">
+                                    ${time}
+                                </div>
+                                <div style="
+                                    width: 3px;
+                                    height: 100%;
+                                    background: var(--terminal-green);
+                                    position: relative;
+                                    min-height: 60px;
+                                ">
+                                    <div style="
+                                        width: 10px;
+                                        height: 10px;
+                                        background: ${isLocationEntry ? 'var(--terminal-yellow)' : 'var(--terminal-cyan)'};
+                                        border-radius: 50%;
+                                        position: absolute;
+                                        left: -3.5px;
+                                        top: 0;
+                                        animation: cursor-blink 2s infinite;
+                                    "></div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div class="entry-content" style="
+                                        background: var(--terminal-bg-card);
+                                        border: 1px solid var(--terminal-green);
+                                        padding: 1rem;
+                                        position: relative;
+                                    ">
+                                        <div style="
+                                            color: var(--terminal-green);
+                                            font-weight: bold;
+                                            margin-bottom: 0.5rem;
+                                            font-size: 14px;
+                                        ">
+                                            ${entry.action ? `[${entry.action.toUpperCase()}]` : '[JOURNAL_ENTRY]'}
+                                        </div>
+                                        <div style="
+                                            color: var(--terminal-white);
+                                            margin-bottom: 0.5rem;
+                                            line-height: 1.4;
+                                        ">
+                                            ${entry.entry}
+                                        </div>
+                                        ${entry.location ? `
+                                            <div style="
+                                                color: var(--terminal-cyan);
+                                                font-size: 12px;
+                                                margin-bottom: 0.25rem;
+                                            ">
+                                                📍 ${entry.location}
+                                            </div>
+                                        ` : ''}
+                                        ${entry.weather ? `
+                                            <div style="
+                                                color: var(--terminal-yellow);
+                                                font-size: 12px;
+                                                margin-bottom: 0.25rem;
+                                            ">
+                                                🌤 ${entry.weather}
+                                            </div>
+                                        ` : ''}
+                                        <div style="
+                                            display: flex;
+                                            gap: 1rem;
+                                            font-size: 11px;
+                                            color: var(--terminal-gray);
+                                            margin-top: 0.5rem;
+                                        ">
+                                            ${entry.steps ? `<span>STEPS: ${entry.steps}</span>` : ''}
+                                            ${entry.device_battery ? `<span>BATTERY: ${entry.device_battery}%</span>` : ''}
+                                            ${entry.phone_mode ? `<span>MODE: ${entry.phone_mode}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = timelineHTML;
+            }
+            
+            updateCharts() {
+                TerminalCharts.createHourlyActivityChart('hourlyDistributionChart', this.filteredEntries);
+                this.createActivityTypeChart();
+                this.createLocationProgressionChart();
+                TerminalCharts.createStepsProgressChart('stepsTimelineChart', this.filteredEntries);
+            }
+            
+            createActivityTypeChart() {
+                const canvas = document.getElementById('activityTypeChart');
+                if (!canvas) return;
+                
+                const activityCounts = {};
+                this.filteredEntries.forEach(entry => {
+                    if (entry.action) {
+                        activityCounts[entry.action] = (activityCounts[entry.action] || 0) + 1;
+                    } else {
+                        activityCounts['Journal Entry'] = (activityCounts['Journal Entry'] || 0) + 1;
+                    }
+                });
+                
+                const labels = Object.keys(activityCounts);
+                const data = Object.values(activityCounts);
+                
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+                
+                new Chart(canvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                'rgba(0, 255, 65, 0.8)',
+                                'rgba(0, 255, 255, 0.8)',
+                                'rgba(255, 255, 0, 0.8)',
+                                'rgba(255, 0, 64, 0.8)',
+                                'rgba(240, 240, 240, 0.8)'
+                            ],
+                            borderColor: [
+                                '#00ff41',
+                                '#00ffff',
+                                '#ffff00',
+                                '#ff0040',
+                                '#f0f0f0'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'ACTIVITY TYPE DISTRIBUTION',
+                                color: '#00ffff',
+                                font: {
+                                    family: "'Fira Code', monospace",
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    color: '#00ff41',
+                                    font: {
+                                        family: "'JetBrains Mono', monospace"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            createLocationProgressionChart() {
+                const canvas = document.getElementById('locationProgressionChart');
+                if (!canvas) return;
+                
+                const locationEntries = this.filteredEntries
+                    .filter(entry => entry.location)
+                    .map((entry, index) => ({
+                        x: index,
+                        y: entry.location.length,
+                        label: entry.location.substring(0, 20) + '...'
+                    }));
+                
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+                
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Location Changes',
+                            data: locationEntries,
+                            borderColor: '#00ff41',
+                            backgroundColor: 'rgba(0, 255, 65, 0.1)',
+                            pointBackgroundColor: '#00ffff',
+                            pointBorderColor: '#00ff41',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'LOCATION PROGRESSION',
+                                color: '#00ffff',
+                                font: {
+                                    family: "'Fira Code', monospace",
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    color: '#00ff41',
+                                    font: {
+                                        family: "'JetBrains Mono', monospace"
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: '#00ff41',
+                                    font: {
+                                        family: "'JetBrains Mono', monospace"
+                                    }
+                                },
+                                grid: {
+                                    color: '#202020'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#00ff41',
+                                    font: {
+                                        family: "'JetBrains Mono', monospace"
+                                    }
+                                },
+                                grid: {
+                                    color: '#202020'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            updateTemporalStats() {
+                const totalEntries = this.filteredEntries.length;
+                const uniqueLocations = new Set(this.filteredEntries.map(e => e.location).filter(Boolean)).size;
+                const totalSteps = this.filteredEntries.reduce((sum, e) => sum + (e.steps || 0), 0);
+                
+                const hourlyData = DataProcessor.createHourlyDistribution(this.filteredEntries);
+                const peakHour = Object.entries(hourlyData)
+                    .sort(([,a], [,b]) => b - a)[0];
+                
+                const activityTypes = {};
+                this.filteredEntries.forEach(entry => {
+                    const type = entry.action || 'Journal Entry';
+                    activityTypes[type] = (activityTypes[type] || 0) + 1;
+                });
+                
+                const mostCommonActivity = Object.entries(activityTypes)
+                    .sort(([,a], [,b]) => b - a)[0];
+                
+                const timeSpan = this.getTimeSpan();
+                
+                const statsContent = document.getElementById('temporalStatsContent');
+                statsContent.innerHTML = `
+                    TIME_RANGE..........: ${timeSpan}<br>
+                    TOTAL_ENTRIES.......: ${totalEntries}<br>
+                    UNIQUE_LOCATIONS....: ${uniqueLocations}<br>
+                    TOTAL_STEPS.........: ${totalSteps.toLocaleString()}<br>
+                    <br>
+                    PEAK_ACTIVITY_HOUR..: ${peakHour ? peakHour[0].padStart(2, '0') + ':00' : 'N/A'}<br>
+                    PEAK_HOUR_COUNT.....: ${peakHour ? peakHour[1] : 'N/A'}<br>
+                    <br>
+                    MOST_COMMON_ACTIVITY: ${mostCommonActivity ? mostCommonActivity[0] : 'N/A'}<br>
+                    ACTIVITY_COUNT......: ${mostCommonActivity ? mostCommonActivity[1] : 'N/A'}<br>
+                    <br>
+                    ANALYSIS_SCOPE......: ${this.currentScope.toUpperCase()}<br>
+                    DATA_GRANULARITY....: ${this.currentGranularity.toUpperCase()}<br>
+                `;
+            }
+            
+            getTimeSpan() {
+                if (this.filteredEntries.length === 0) return 'NO DATA';
+                
+                const dates = this.filteredEntries.map(e => new Date(e.datetime)).sort((a, b) => a - b);
+                const start = dates[0];
+                const end = dates[dates.length - 1];
+                
+                if (this.currentScope === 'day') {
+                    return start.toLocaleDateString();
+                } else {
+                    return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+                }
+            }
+            
+            renderActivityHeatmap() {
+                const heatmapGrid = document.getElementById('heatmapGrid');
+                
+                if (this.currentScope !== 'day') {
+                    heatmapGrid.innerHTML = '<div style="color: var(--terminal-yellow);">HEATMAP AVAILABLE FOR DAILY VIEW ONLY</div>';
+                    return;
+                }
+                
+                const hourlyData = DataProcessor.createHourlyDistribution(this.filteredEntries);
+                const maxActivity = Math.max(...Object.values(hourlyData));
+                
+                let heatmapHTML = '<div style="display: flex; align-items: center; margin-bottom: 1rem;">';
+                heatmapHTML += '<div style="width: 60px; font-size: 11px;">HOUR:</div>';
+                
+                for (let hour = 0; hour < 24; hour++) {
+                    heatmapHTML += `<div style="width: 30px; text-align: center; font-size: 10px;">${hour.toString().padStart(2, '0')}</div>`;
+                }
+                heatmapHTML += '</div>';
+                
+                heatmapHTML += '<div style="display: flex; align-items: center;">';
+                heatmapHTML += '<div style="width: 60px; font-size: 11px;">ACTIVITY:</div>';
+                
+                for (let hour = 0; hour < 24; hour++) {
+                    const activity = hourlyData[hour] || 0;
+                    const intensity = maxActivity > 0 ? activity / maxActivity : 0;
+                    
+                    let color = '#0a0a0a';
+                    let symbol = '░';
+                    
+                    if (intensity > 0.7) {
+                        color = '#00ff41';
+                        symbol = '█';
+                    } else if (intensity > 0.4) {
+                        color = '#00ffff';
+                        symbol = '▓';
+                    } else if (intensity > 0.1) {
+                        color = '#ffff00';
+                        symbol = '▒';
+                    }
+                    
+                    heatmapHTML += `
+                        <div style="
+                            width: 30px;
+                            height: 20px;
+                            text-align: center;
+                            color: ${color};
+                            font-size: 16px;
+                            line-height: 20px;
+                            cursor: pointer;
+                            title: 'Hour ${hour}: ${activity} activities';
+                        ">${symbol}</div>
+                    `;
+                }
+                heatmapHTML += '</div>';
+                
+                heatmapGrid.innerHTML = heatmapHTML;
+            }
+            
+            exportTimelineData() {
+                const data = {
+                    timelineData: this.filteredEntries,
+                    scope: this.currentScope,
+                    targetDate: this.currentDate,
+                    granularity: this.currentGranularity,
+                    statistics: {
+                        totalEntries: this.filteredEntries.length,
+                        dateRange: this.getTimeSpan(),
+                        exportedAt: new Date().toISOString()
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `life-logger-timeline-${this.currentDate}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            showLoading(show) {
+                const overlay = document.getElementById('timelineLoadingOverlay');
+                overlay.style.display = show ? 'flex' : 'none';
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TimelinePage();
+        });
+    </script>
+}

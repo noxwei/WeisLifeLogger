@@ -1,0 +1,206 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "LIFE LOGGER TERMINAL";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ascii-border">
+                <h1 class="terminal-title text-center">
+                    ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗
+                    <br>██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║
+                    <br>███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║
+                    <br>╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║
+                    <br>███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║
+                    <br>╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝
+                </h1>
+                <p class="terminal-text text-center terminal-cursor">
+                    <span class="terminal-prompt">LIFE LOGGING SYSTEM v2.0 - READY FOR INPUT</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Status Display -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-number">@(Model.Statistics.ContainsKey("TotalEntries") ? Model.Statistics["TotalEntries"] : 0)</div>
+                <div class="stat-label">TOTAL ENTRIES</div>
+                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">█████████████████████</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-number">@(Model.Statistics.ContainsKey("UniqueLocations") ? Model.Statistics["UniqueLocations"] : 0)</div>
+                <div class="stat-label">LOCATIONS</div>
+                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">██████████████░░░░░░░</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-number">@(Model.Statistics.ContainsKey("TotalSteps") ? string.Format("{0:N0}", Model.Statistics["TotalSteps"]) : "0")</div>
+                <div class="stat-label">TOTAL STEPS</div>
+                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">███████████████░░░░░░</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-number">@(Model.Statistics.ContainsKey("AverageEntriesPerDay") ? Model.Statistics["AverageEntriesPerDay"] : "0")</div>
+                <div class="stat-label">AVG/DAY</div>
+                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">█████████░░░░░░░░░░░░</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Today's Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    TODAY'S SYSTEM STATUS
+                </div>
+                <div class="card-body">
+                    @if (Model.TodaySummary != null && Model.TodaySummary.EntryCount > 0)
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">system.stats --today</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                                ENTRIES.........: @Model.TodaySummary.EntryCount<br>
+                                STEPS...........: @(Model.TodaySummary.TotalSteps?.ToString("N0") ?? "N/A")<br>
+                                LOCATIONS.......: @Model.TodaySummary.Locations.Count<br>
+                                ACTIVITIES......: @Model.TodaySummary.Activities.Count
+                            </div>
+                            @if (Model.TodaySummary.MostFrequentLocation != null)
+                            {
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--terminal-green);">
+                                    <div class="terminal-prompt">system.location --frequent</div>
+                                    <div style="margin-left: 1rem; color: var(--terminal-cyan);">@Model.TodaySummary.MostFrequentLocation</div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">system.stats --today</div>
+                            <div style="margin-left: 1rem; color: var(--terminal-yellow);">NO DATA LOGGED TODAY</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">IMPORT DATA TO BEGIN TRACKING</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Locations -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION FREQUENCY MAP
+                </div>
+                <div class="card-body">
+                    @if (Model.LocationFrequency.Any())
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">system.locations --rank</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace;">
+                                @foreach (var location in Model.LocationFrequency)
+                                {
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>@location.Key</span>
+                                        <span class="text-info">[@location.Value]</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">system.locations --rank</div>
+                            <div style="margin-left: 1rem; color: var(--terminal-yellow);">NO LOCATION DATA AVAILABLE</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Entries -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    RECENT SYSTEM ENTRIES
+                    <a href="/Entries" class="btn btn-primary">VIEW ALL</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentEntries.Any())
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">system.log --recent</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>DATE</th>
+                                                <th>TIME</th>
+                                                <th>ENTRY</th>
+                                                <th>LOCATION</th>
+                                                <th>ACTION</th>
+                                                <th>STEPS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var entry in Model.RecentEntries)
+                                            {
+                                                <tr>
+                                                    <td>@entry.Date</td>
+                                                    <td>@entry.Time</td>
+                                                    <td>
+                                                        @if (entry.Entry.Length > 50)
+                                                        {
+                                                            @(entry.Entry.Substring(0, 50) + "...")
+                                                        }
+                                                        else
+                                                        {
+                                                            @entry.Entry
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(entry.Location))
+                                                        {
+                                                            <span class="badge bg-info">@entry.Location</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(entry.Action))
+                                                        {
+                                                            <span class="badge bg-primary">@entry.Action</span>
+                                                        }
+                                                    </td>
+                                                    <td>@(entry.Steps?.ToString("N0") ?? "")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">system.log --recent</div>
+                            <div style="margin-left: 1rem; color: var(--terminal-yellow);">NO ENTRIES FOUND</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">IMPORT DATA TO BEGIN TRACKING</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

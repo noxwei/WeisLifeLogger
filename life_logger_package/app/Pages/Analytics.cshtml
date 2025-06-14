@@ -1,0 +1,527 @@
+@page
+@model AnalyticsModel
+@{
+    ViewData["Title"] = "DATA ANALYTICS";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ascii-border">
+                <h1 class="terminal-title text-center">
+                    █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗████████╗██╗ ██████╗███████╗
+                    <br>██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝╚══██╔══╝██║██╔════╝██╔════╝
+                    <br>███████║██╔██╗ ██║███████║██║   ╚████╔╝    ██║   ██║██║     ███████╗
+                    <br>██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝     ██║   ██║██║     ╚════██║
+                    <br>██║  ██║██║ ╚████║██║  ██║███████╗██║      ██║   ██║╚██████╗███████║
+                    <br>╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝      ╚═╝   ╚═╝ ╚═════╝╚══════╝
+                </h1>
+                <p class="terminal-text text-center terminal-cursor">
+                    <span class="terminal-prompt">ADVANCED DATA ANALYTICS SYSTEM - PATTERN RECOGNITION ENABLED</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    ANALYTICS CONTROL INTERFACE
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">TIME PERIOD</label>
+                            <select id="timePeriodSelect" class="form-select">
+                                <option value="all">ALL TIME</option>
+                                <option value="30">LAST 30 DAYS</option>
+                                <option value="90">LAST 90 DAYS</option>
+                                <option value="365">LAST YEAR</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">CHART TYPE</label>
+                            <select id="chartTypeSelect" class="form-select">
+                                <option value="timeseries">TIME SERIES</option>
+                                <option value="distribution">DISTRIBUTION</option>
+                                <option value="correlation">CORRELATION</option>
+                                <option value="trend">TREND ANALYSIS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">METRIC FOCUS</label>
+                            <select id="metricSelect" class="form-select">
+                                <option value="entries">ENTRY COUNT</option>
+                                <option value="steps">STEP TRACKING</option>
+                                <option value="locations">LOCATION DATA</option>
+                                <option value="activities">ACTIVITY TYPES</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">ACTIONS</label>
+                            <div class="d-flex gap-2">
+                                <button id="refreshAnalyticsBtn" class="btn btn-primary flex-fill">ANALYZE</button>
+                                <button id="exportAnalyticsBtn" class="btn btn-secondary">EXPORT</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Statistics Display -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    SYSTEM STATISTICS OVERVIEW
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="stat-card">
+                                <div class="stat-number">@(Model.OverallStats.ContainsKey("TotalEntries") ? Model.OverallStats["TotalEntries"] : 0)</div>
+                                <div class="stat-label">TOTAL ENTRIES</div>
+                                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">████████████████████████</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card">
+                                <div class="stat-number">@(Model.OverallStats.ContainsKey("UniqueLocations") ? Model.OverallStats["UniqueLocations"] : 0)</div>
+                                <div class="stat-label">LOCATIONS</div>
+                                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">████████████░░░░░░░░░░░░</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card">
+                                <div class="stat-number">@(Model.OverallStats.ContainsKey("UniqueActions") ? Model.OverallStats["UniqueActions"] : 0)</div>
+                                <div class="stat-label">ACTIONS</div>
+                                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">████████████████▓▓▓▓▓▓▓▓</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card">
+                                <div class="stat-number">@(Model.OverallStats.ContainsKey("TotalSteps") ? string.Format("{0:N0}", Model.OverallStats["TotalSteps"]) : "0")</div>
+                                <div class="stat-label">TOTAL STEPS</div>
+                                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">████████████████████▓▓▓▓</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card">
+                                <div class="stat-number">@(Model.OverallStats.ContainsKey("AverageEntriesPerDay") ? Model.OverallStats["AverageEntriesPerDay"] : "0")</div>
+                                <div class="stat-label">AVG/DAY</div>
+                                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">██████████░░░░░░░░░░░░░░</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card">
+                                <div class="stat-number">
+                                    @if (Model.OverallStats.ContainsKey("FirstEntryDate") && Model.OverallStats.ContainsKey("LastEntryDate"))
+                                    {
+                                        @(DateTime.TryParse(Model.OverallStats["LastEntryDate"].ToString(), out var lastDate) && 
+                                          DateTime.TryParse(Model.OverallStats["FirstEntryDate"].ToString(), out var firstDate) 
+                                          ? (lastDate - firstDate).Days + 1 : 0)
+                                    }
+                                    else
+                                    {
+                                        @(0)
+                                    }
+                                </div>
+                                <div class="stat-label">DAYS TRACKED</div>
+                                <div class="terminal-text" style="font-size: 0.8rem; margin-top: 0.5rem;">████████████████████████</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Visualizations -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    TIME SERIES ANALYSIS
+                </div>
+                <div class="card-body">
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="timeSeriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    ACTIVITY DISTRIBUTION
+                </div>
+                <div class="card-body">
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="activityDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    WEEKLY PATTERN ANALYSIS
+                </div>
+                <div class="card-body">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="weeklyPatternChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION FREQUENCY
+                </div>
+                <div class="card-body">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="locationFrequencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    STEPS PROGRESS
+                </div>
+                <div class="card-body">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="stepsProgressChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Location Analytics -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION INTELLIGENCE
+                </div>
+                <div class="card-body">
+                    @if (Model.LocationFrequency.Any())
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">location.analyze --frequency</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                                @foreach (var location in Model.LocationFrequency.Take(10))
+                                {
+                                    var percentage = Model.LocationFrequency.Any() ? (double)location.Value / Model.LocationFrequency.Values.Sum() * 100 : 0;
+                                    <div style="margin-bottom: 0.5rem; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>@(location.Key.Length > 30 ? location.Key.Substring(0, 27) + "..." : location.Key)</span>
+                                            <span style="color: var(--terminal-cyan);">[[@location.Value]]</span>
+                                        </div>
+                                        <div style="margin-top: 2px;">
+                                            @for (int i = 0; i < 20; i++)
+                                            {
+                                                @(i < (percentage / 5) ? "█" : "░")
+                                            }
+                                            <span style="margin-left: 0.5rem; color: var(--terminal-yellow);">@percentage.ToString("F1")%</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (Model.AverageStepsByLocation.Any())
+                            {
+                                <div style="margin-top: 1.5rem;">
+                                    <div class="terminal-prompt">location.steps --average</div>
+                                    <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                                        @foreach (var location in Model.AverageStepsByLocation.Take(5))
+                                        {
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                                                <span>@(location.Key.Length > 25 ? location.Key.Substring(0, 22) + "..." : location.Key)</span>
+                                                <span style="color: var(--terminal-cyan);">@location.Value.ToString("N0") STEPS</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">location.analyze --no-data</div>
+                            <div style="margin-left: 1rem; color: var(--terminal-yellow);">NO LOCATION DATA AVAILABLE</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Analytics -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    ACTIVITY PATTERN ANALYSIS
+                </div>
+                <div class="card-body">
+                    @if (Model.ActionFrequency.Any())
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">activity.analyze --frequency</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                                @foreach (var action in Model.ActionFrequency.Take(10))
+                                {
+                                    var percentage = Model.ActionFrequency.Any() ? (double)action.Value / Model.ActionFrequency.Values.Sum() * 100 : 0;
+                                    <div style="margin-bottom: 0.5rem; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>@action.Key</span>
+                                            <span style="color: var(--terminal-cyan);">[[@action.Value]]</span>
+                                        </div>
+                                        <div style="margin-top: 2px;">
+                                            @for (int i = 0; i < 20; i++)
+                                            {
+                                                @(i < (percentage / 5) ? "█" : "░")
+                                            }
+                                            <span style="margin-left: 0.5rem; color: var(--terminal-yellow);">@percentage.ToString("F1")%</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="terminal-text">
+                            <div class="terminal-prompt">activity.analyze --no-data</div>
+                            <div style="margin-left: 1rem; color: var(--terminal-yellow);">NO ACTIVITY DATA AVAILABLE</div>
+                        </div>
+                    }
+
+                    @if (Model.WeatherFrequency.Any())
+                    {
+                        <div class="terminal-text" style="margin-top: 1.5rem;">
+                            <div class="terminal-prompt">weather.patterns --analyze</div>
+                            <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                                @foreach (var weather in Model.WeatherFrequency.Take(5))
+                                {
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                                        <span>@weather.Key</span>
+                                        <span style="color: var(--terminal-yellow);">@weather.Value OCCURRENCES</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Timeline -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    TEMPORAL ACTIVITY ANALYSIS
+                </div>
+                <div class="card-body">
+                    <div style="height: 200px; position: relative;">
+                        <canvas id="activityTimelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Intelligence Report -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    SYSTEM INTELLIGENCE REPORT
+                </div>
+                <div class="card-body">
+                    <div class="terminal-text" id="intelligenceReport">
+                        <div class="terminal-prompt">system.intelligence --generate-report</div>
+                        <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div style="text-align: center; margin-bottom: 1rem;">
+                                        <div style="color: var(--terminal-cyan); font-size: 18px; font-weight: bold;">
+                                            @if (Model.OverallStats.ContainsKey("FirstEntryDate"))
+                                            {
+                                                @Model.OverallStats["FirstEntryDate"]
+                                            }
+                                            else
+                                            {
+                                                @("N/A")
+                                            }
+                                        </div>
+                                        <div style="color: var(--terminal-gray); font-size: 12px;">FIRST_ENTRY_DATE</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div style="text-align: center; margin-bottom: 1rem;">
+                                        <div style="color: var(--terminal-green); font-size: 18px; font-weight: bold;">
+                                            @if (Model.OverallStats.ContainsKey("LastEntryDate"))
+                                            {
+                                                @Model.OverallStats["LastEntryDate"]
+                                            }
+                                            else
+                                            {
+                                                @("N/A")
+                                            }
+                                        </div>
+                                        <div style="color: var(--terminal-gray); font-size: 12px;">LATEST_ENTRY_DATE</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div style="text-align: center; margin-bottom: 1rem;">
+                                        <div style="color: var(--terminal-yellow); font-size: 18px; font-weight: bold;">
+                                            @(Model.LocationFrequency.Any() ? (Model.LocationFrequency.First().Key.Length > 15 ? Model.LocationFrequency.First().Key.Substring(0, 12) + "..." : Model.LocationFrequency.First().Key) : "N/A")
+                                        </div>
+                                        <div style="color: var(--terminal-gray); font-size: 12px;">PRIMARY_LOCATION</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div style="text-align: center; margin-bottom: 1rem;">
+                                        <div style="color: var(--terminal-red); font-size: 18px; font-weight: bold;">
+                                            @(Model.ActionFrequency.Any() ? Model.ActionFrequency.First().Key : "N/A")
+                                        </div>
+                                        <div style="color: var(--terminal-gray); font-size: 12px;">PRIMARY_ACTIVITY</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <script type="module">
+        import { LifeLoggerAPI, DataProcessor } from '/js/dist/utils/api.js';
+        import { TerminalCharts } from '/js/dist/visualizations/charts.js';
+        
+        class AnalyticsPage {
+            constructor() {
+                this.allEntries = [];
+                this.filteredEntries = [];
+                this.currentPeriod = 'all';
+                this.currentMetric = 'entries';
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    await this.loadData();
+                    this.initializeControls();
+                    this.updateAllCharts();
+                } catch (error) {
+                    console.error('Failed to initialize analytics page:', error);
+                }
+            }
+            
+            async loadData() {
+                const response = await LifeLoggerAPI.getEntries();
+                if (response.success) {
+                    this.allEntries = response.data;
+                    this.filteredEntries = [...this.allEntries];
+                }
+            }
+            
+            initializeControls() {
+                document.getElementById('timePeriodSelect').addEventListener('change', (e) => {
+                    this.currentPeriod = e.target.value;
+                    this.filterDataByPeriod();
+                    this.updateAllCharts();
+                });
+                
+                document.getElementById('chartTypeSelect').addEventListener('change', (e) => {
+                    this.updateAllCharts();
+                });
+                
+                document.getElementById('metricSelect').addEventListener('change', (e) => {
+                    this.currentMetric = e.target.value;
+                    this.updateAllCharts();
+                });
+                
+                document.getElementById('refreshAnalyticsBtn').addEventListener('click', () => {
+                    this.updateAllCharts();
+                });
+                
+                document.getElementById('exportAnalyticsBtn').addEventListener('click', () => {
+                    this.exportAnalyticsData();
+                });
+            }
+            
+            filterDataByPeriod() {
+                if (this.currentPeriod === 'all') {
+                    this.filteredEntries = [...this.allEntries];
+                } else {
+                    const days = parseInt(this.currentPeriod);
+                    const cutoffDate = new Date();
+                    cutoffDate.setDate(cutoffDate.getDate() - days);
+                    
+                    this.filteredEntries = this.allEntries.filter(entry => 
+                        new Date(entry.datetime) >= cutoffDate
+                    );
+                }
+            }
+            
+            updateAllCharts() {
+                TerminalCharts.createTimeSeriesChart('timeSeriesChart', this.filteredEntries, this.currentMetric);
+                TerminalCharts.createLocationFrequencyChart('activityDistributionChart', this.filteredEntries);
+                TerminalCharts.createWeeklyPatternChart('weeklyPatternChart', this.filteredEntries);
+                TerminalCharts.createLocationFrequencyChart('locationFrequencyChart', this.filteredEntries);
+                TerminalCharts.createStepsProgressChart('stepsProgressChart', this.filteredEntries);
+                TerminalCharts.createTimeSeriesChart('activityTimelineChart', this.filteredEntries, 'entries');
+            }
+            
+            exportAnalyticsData() {
+                const analytics = {
+                    period: this.currentPeriod,
+                    metric: this.currentMetric,
+                    totalEntries: this.filteredEntries.length,
+                    dateRange: {
+                        start: this.filteredEntries.length > 0 ? this.filteredEntries[0].date : null,
+                        end: this.filteredEntries.length > 0 ? this.filteredEntries[this.filteredEntries.length - 1].date : null
+                    },
+                    locationStats: DataProcessor.aggregateLocationVisits(this.filteredEntries),
+                    hourlyDistribution: DataProcessor.createHourlyDistribution(this.filteredEntries),
+                    weeklyDistribution: DataProcessor.createWeeklyDistribution(this.filteredEntries),
+                    exportedAt: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(analytics, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `life-logger-analytics-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new AnalyticsPage();
+        });
+    </script>
+}

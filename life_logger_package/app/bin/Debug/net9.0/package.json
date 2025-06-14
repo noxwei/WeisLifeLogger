@@ -1,0 +1,25 @@
+{
+  "name": "wei-life-logger",
+  "version": "2.0.0",
+  "description": "Wei Life Logger - Retro Terminal Life Logging System with Data Visualizations",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "npm run watch",
+    "clean": "rimraf wwwroot/js/dist"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.8",
+    "@types/leaflet.markercluster": "^1.5.4",
+    "typescript": "^5.3.3",
+    "rimraf": "^5.0.5"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^3.0.6"
+  }
+}

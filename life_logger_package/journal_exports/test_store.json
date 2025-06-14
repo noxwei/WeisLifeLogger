@@ -1,0 +1,52 @@
+{
+  "entries": [
+    {
+      "entry": "Test entry with all fields",
+      "action": "driving",
+      "datetime": "2025-06-13 10:30:00",
+      "date": "2025-06-13",
+      "time": "10:30:00",
+      "location": "Home",
+      "weather": "Sunny",
+      "phone_mode": "normal",
+      "device": "iPhone",
+      "steps": 1500,
+      "hrv": 45,
+      "device_battery": 85
+    },
+    {
+      "entry": "Test entry with null integers",
+      "action": "walking",
+      "datetime": "2025-06-13 11:00:00",
+      "date": "2025-06-13",
+      "time": "11:00:00",
+      "location": "Park",
+      "weather": "Cloudy",
+      "phone_mode": "silent",
+      "device": "iPhone",
+      "steps": null,
+      "hrv": null,
+      "device_battery": null
+    },
+    {
+      "entry": "Test entry with string numbers",
+      "action": "working",
+      "datetime": "2025-06-13 12:00:00",
+      "date": "2025-06-13",
+      "time": "12:00:00",
+      "location": "Office",
+      "weather": "Rainy",
+      "phone_mode": "normal",
+      "device": "iPhone",
+      "steps": "2500",
+      "hrv": "38",
+      "device_battery": "75"
+    },
+    {
+      "entry": "Test entry with missing optional fields",
+      "datetime": "2025-06-13 13:00:00",
+      "date": "2025-06-13",
+      "time": "13:00:00"
+    }
+  ]
+}

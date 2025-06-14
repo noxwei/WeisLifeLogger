@@ -1,0 +1,139 @@
+@page
+@{
+    ViewData["Title"] = "QUICK MAPS DEMO";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ascii-border">
+                <h1 class="terminal-title text-center">
+                    GEOGRAPHIC INTELLIGENCE DEMO
+                </h1>
+                <p class="terminal-text text-center terminal-cursor">
+                    <span class="terminal-prompt">BASIC LOCATION MAPPING SYSTEM</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Map -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    ANN ARBOR LOCATION MAP
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div id="quickMap" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Charts -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    DAILY ENTRIES (LAST 14 DAYS)
+                </div>
+                <div class="card-body">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="entriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    LOCATION FREQUENCY
+                </div>
+                <div class="card-body">
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="locationsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .leaflet-container {
+            background: var(--terminal-bg) !important;
+        }
+        
+        .leaflet-control-zoom a {
+            background-color: var(--terminal-bg-card) !important;
+            color: var(--terminal-green) !important;
+            border: 1px solid var(--terminal-green) !important;
+        }
+        
+        .leaflet-control-attribution {
+            background-color: var(--terminal-bg-card) !important;
+            color: var(--terminal-green) !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+    </style>
+    
+    <script type="module">
+        import { SimpleAPI } from '/js/dist/simple/api.js';
+        import { BasicMaps } from '/js/dist/simple/basicMaps.js';
+        import { BasicCharts } from '/js/dist/simple/basicCharts.js';
+        
+        class QuickMapsDemo {
+            constructor() {
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    console.log('Loading data...');
+                    const response = await SimpleAPI.getEntries();
+                    
+                    if (response.success && response.data.length > 0) {
+                        console.log('Data loaded:', response.data.length, 'entries');
+                        
+                        // Create map
+                        BasicMaps.createSimpleMap('quickMap');
+                        BasicMaps.addLocationMarkers('quickMap', response.data);
+                        
+                        // Process data for charts
+                        const { entryData, stepsData } = SimpleAPI.processEntriesForCharts(response.data);
+                        const locationData = SimpleAPI.processLocationsForChart(response.data);
+                        
+                        // Create charts
+                        BasicCharts.createSimpleLineChart('entriesChart', entryData, 'Daily Entries');
+                        BasicCharts.createSimpleBarChart('locationsChart', locationData, 'Location Visits');
+                        
+                        console.log('Demo initialized successfully!');
+                    } else {
+                        console.error('No data available or API error');
+                        document.getElementById('quickMap').innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #00ff41; font-family: 'JetBrains Mono', monospace;">
+                                NO DATA AVAILABLE - IMPORT JOURNAL ENTRIES FIRST
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Demo initialization failed:', error);
+                }
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new QuickMapsDemo();
+        });
+    </script>
+}

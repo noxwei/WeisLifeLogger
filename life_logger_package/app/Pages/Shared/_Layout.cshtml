@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] | WEI LIFE LOGGER TERMINAL</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/LifeLoggerApp.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    WEI LIFE LOGGER
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                        style="border: 1px solid var(--terminal-green); background: transparent;">
+                    <span style="color: var(--terminal-green);">▣</span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Index">
+                                DASHBOARD
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Entries">
+                                ENTRIES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Summary">
+                                SUMMARY
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Analytics">
+                                ANALYTICS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Maps">
+                                MAPS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Timeline">
+                                TIMELINE
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Search">
+                                SEARCH
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                SYSTEM
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown" 
+                                style="background: var(--terminal-bg-card); border: 1px solid var(--terminal-green);">
+                                <li><a class="dropdown-item terminal-text" href="/api/entries" target="_blank" 
+                                       style="color: var(--terminal-green); background: transparent;">
+                                    > API_ENTRIES
+                                </a></li>
+                                <li><a class="dropdown-item terminal-text" href="/health" target="_blank"
+                                       style="color: var(--terminal-green); background: transparent;">
+                                    > HEALTH_CHECK
+                                </a></li>
+                                <li><hr class="dropdown-divider" style="border-color: var(--terminal-green);"></li>
+                                <li><a class="dropdown-item terminal-text" asp-area="" asp-page="/Privacy"
+                                       style="color: var(--terminal-green); background: transparent;">
+                                    > PRIVACY_POLICY
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="terminal-text">
+                        <span class="terminal-prompt">copyright.info</span>
+                        <span style="margin-left: 1rem;">© 2025 WEI LIFE LOGGER - LOCAL-FIRST SYSTEM</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="terminal-text">
+                        <span class="terminal-prompt">system.stack</span>
+                        <span style="margin-left: 0.5rem;">SQLITE | PRIVACY-FIRST | </span>
+                        <a asp-area="" asp-page="/Privacy" class="text-info text-decoration-none">POLICY</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
