@@ -1,0 +1,13 @@
+
+cat >> .gitignore << 'EOF'
+
+# Personal Data Files
+**/journal_exports/store.json
+**/journal_exports/store.converted.json
+**/journal_exports/*personal*
+**/journal_db/*.db
+**/logs/*.log
+
+# Keep test data but exclude real data
+!**/journal_exports/sample_*.json
+!**/journal_exports/demo_*.json
