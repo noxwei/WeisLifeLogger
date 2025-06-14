@@ -1,4 +1,3 @@
-
 # Wei Life Logger - Developer Documentation
 
 
