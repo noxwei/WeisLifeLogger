@@ -1,6 +1,6 @@
 
 # Wei Life Logger - Developer Documentation
-## Table of Contents
+
 
 ## Table of Contents
 
