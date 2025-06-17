@@ -1,13 +1,77 @@
-
-cat >> .gitignore << 'EOF'
-
-# Personal Data Files
+# Personal Data Protection - Never commit personal journal data
+**/journal_exports/*.json
+**/journal_exports/raw_*.json
+**/journal_exports/converted_*.json
+**/journal_exports/enhanced_*.json
+**/journal_exports/clean_*.json
 **/journal_exports/store.json
-**/journal_exports/store.converted.json
-**/journal_exports/*personal*
-**/journal_db/*.db
-**/logs/*.log
+**/journal_exports/store_*.json
+**/journal_exports/*.txt
 
-# Keep test data but exclude real data
+# Database Files
+**/journal_db/*.db
+**/journal_db/*.sqlite
+**/journal_db/*.sqlite3
+
+# Log Files
+**/logs/*.log
+**/logs/*.txt
+/tmp/*.log
+
+# Personal backup files
+**/backups/*.db
+**/backups/*.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# .NET artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.props
+**/.vs/
+**/Debug/
+**/Release/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# IDE files
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts and cache
+dist/
+build/
+*.map
+.cache/
+coverage/
+
+# Keep demo/sample files for documentation
 !**/journal_exports/sample_*.json
 !**/journal_exports/demo_*.json
+!**/journal_exports/example_*.json
+!**/journal_exports/README.md
